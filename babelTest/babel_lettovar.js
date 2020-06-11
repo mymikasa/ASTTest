@@ -9,4 +9,4 @@ function letToVar(babel) {
     return {visitor};
   }
   
-  module.exports = letToVar;
+module.exports = letToVar;
