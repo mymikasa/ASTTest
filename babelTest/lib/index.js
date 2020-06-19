@@ -1,7 +1,17 @@
 "use strict";
 
-var a = 1;
-var b = {
-  a: 'e',
-  b: 'f'
+var _0x4db1c = function _0x4db1c() {
+  function _0x355d23(_0x450614) {
+    if (("" + _0x450614 / _0x450614)[_0x55f3("0x1c", "V2KE")] !== 0x1 || _0x450614 % 0x14 === 0x0) {
+      (function () {})[_0x55f3("0x1d", "CNUY")]((undefined + "")[0x2] + (!![] + "")[0x3] + ([][_0x55f3("0x1e", "w8PR")]() + "")[0x2] + (undefined + "")[0x0] + (![] + [0x0] + String)[0x14] + (![] + [0x0] + String)[0x14] + (!![] + "")[0x3] + (!![] + "")[0x1])();
+    } else {
+      (function () {})["constructor"]((undefined + "")[0x2] + (!![] + "")[0x3] + ([][_0x55f3("0x1f", "L$(D")]() + "")[0x2] + (undefined + "")[0x0] + (![] + [0x0] + String)[0x14] + (![] + [0x0] + String)[0x14] + (!![] + "")[0x3] + (!![] + "")[0x1])();
+    }
+
+    _0x355d23(++_0x450614);
+  }
+
+  try {
+    _0x355d23(0x0);
+  } catch (_0x54c483) {}
 };

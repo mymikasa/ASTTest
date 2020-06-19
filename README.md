@@ -4,4 +4,5 @@
 src目录下是未经过转换的源代码
 lib是目录存放的是转换之后的代码
 
-转换命令`./node_modules/.bin/babel src/index.js --out-dir lib`
+转换命令`./node_modules/.bin/babel src/index.js --out-dir lib`,
+`./node_modules/.bin/babel --plugins ./plugin.js index.js`
