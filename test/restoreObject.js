@@ -46,12 +46,14 @@ const visitor = {
             }
             else if (t.isFunctionExpression(value)) {
                 let ret_state = value.body.body[0];
+                var aa = generator(scope.path.node);
                 //特征判断，如果不是return表达式
                 if (!t.isReturnStatement(ret_state)) continue;
                 scope.traverse(scope.block, {
                     CallExpression: function (_path) {
                         //遍历CallExpression
                         let { callee, arguments } = _path.node;
+                        let tt = generator;
                         if (!t.isMemberExpression(callee)) return;
                         if (!t.isIdentifier(callee.object, { name: name })) return;
                         if (!t.isLiteral(callee.property, { value: key })) return;
