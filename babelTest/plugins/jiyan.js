@@ -154,11 +154,21 @@ var nameArray = [];
 
 const visitor = {
     VariableDeclaration: {
-        enter: [get_name_Array]
+        enter: [
+            get_name_Array,
+            del_DWV]
     },
     CallExpression: {
-        enter: [replace_name_array,replace_DWV]
-    }
+        enter: [
+            replace_name_array,
+            replace_DWV]
+    },
+    
+    StringLiteral: {
+        enter: [
+            replace_unicode,
+        ]
+    },
 };
 
 function replace_DWV(path) {
@@ -206,12 +216,50 @@ function replace_name_array(path) {
     let arg = node.arguments[0].value;
     var value = AVvBE.DWV(arg);
     path.replaceInline(types.valueToNode(value));
+};
+
+function del_DWV(path) {
+    let node = path.node;
+    let declarations = path.get('declarations');
+
+    if (declarations == undefined || declarations.length != 3)
+        return
+
+    let init = declarations[0].node.init;
+
+    try {
+        let propertyName = declarations[0].node.init.property.name;
+        if (propertyName != 'DWV') return
+
+        let nextPath = path.getNextSibling();
+        let nnextPath = nextPath.getNextSibling();
+
+        if (nextPath.type == 'ExpressionStatement' & nnextPath.type == 'VariableDeclaration'){
+            path.remove();
+            nextPath.remove();
+            nnextPath.remove();
+        }  
+    }
+    catch (err) {
+        return;
+    }
+    // let propertyName = declarations[0].node.init.property.name;
+      
 }
 
+
+function replace_unicode(path) {
+    var node = path.node;
+    if (node.extra == undefined) {
+        return;
+    };
+
+    delete node.extra
+}
 var ast = parser.parse(jscode);
 traverse(ast, visitor);
 
-var finCode = generator(ast);
+var finCode = generator(ast, opts = {jsescOption:{"minimal":true}});
 
 fs.writeFile(finPath, finCode.code, (err)=>{});
 
