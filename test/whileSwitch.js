@@ -6,8 +6,6 @@ const traverse = require('@babel/traverse').default;
 
 
 const jscode = `
-var t = 1;
-var s = 2;
 var arr = "3|0|1|2|4".split("|");
 var cnt = 0;
 while (true) {
@@ -30,7 +28,7 @@ while (true) {
     }
     break;
 }
-var tt = 6;`
+`
 
 
 const visitor = {
@@ -51,13 +49,36 @@ function whileSwitch(path) {
     let arr_name = discriminant.object.name;
     let arr = [];
     let all_pre_siblings = path.getAllPrevSiblings();
-    let tt = path.get('test');
-    let aa = path.getCompletionRecords();
-    console.log(aa[0].toString());
+
+    if (all_pre_siblings.length !== 2) return;
+    all_pre_siblings.forEach(pre_path => {
+        let { declarations } = pre_path.node;
+        let { id, init } = declarations[0];
+
+        if (arr_name === id.name) {
+            // let tt = traverse(init);
+            let tt = generator(init);
+            arr = eval(tt.code);
+        }
+        pre_path.remove()
+    });
+
+    let retBody = [];
+
+    arr.forEach(index => {
+        let caseBody = cases[index].consequent;
+        if (t.isContinueStatement(caseBody[caseBody.length - 1])) {
+            caseBody.pop()
+        }
+        retBody = retBody.concat(caseBody)
+    });
+
+    path.replaceInline(retBody);
+
 }
 
 var ast = parser.parse(jscode);
 traverse(ast, visitor);
 
 var finCode = generator(ast);
-// console.log(finCode.code);
+console.log(finCode.code);
