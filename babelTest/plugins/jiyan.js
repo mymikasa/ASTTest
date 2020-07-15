@@ -6,9 +6,10 @@ const generator = require('@babel/generator').default;
 const traverse = require('@babel/traverse').default;
 
 const fs = require('fs');
+const { type } = require('os');
 
-var filePath = dirpath.join(dirpath.resolve(__dirname, '../'), 'encryption/jiyan.js');
-var finPath = dirpath.join(dirpath.resolve(__dirname, '../'), 'decryption/jy.js');
+var filePath = dirpath.join(dirpath.resolve(__dirname, '../'), 'encryption/jy2.js');
+var finPath = dirpath.join(dirpath.resolve(__dirname, '../'), 'decryption/jy2.js');
 console.log(filePath);
 var jscode = fs.readFileSync(filePath, {
     encoding: "utf-8"
@@ -169,6 +170,11 @@ const visitor = {
             replace_unicode,
         ]
     },
+    ForStatement: {
+        enter: [
+            replaceForSwitch,
+        ]
+    }
 };
 
 function replace_DWV(path) {
@@ -255,6 +261,100 @@ function replace_unicode(path) {
     };
 
     delete node.extra
+}
+
+function replaceForSwitch(path) {
+    // console.log('111');
+    let node = path.node;
+    let allPreSiblings = path.getAllPrevSiblings();
+    if (allPreSiblings.length !== 1) return;
+    // if (!types.isVariableDeclarator(allPreSiblings[0])) return;
+
+    let lastSibling = path.getPrevSibling();
+    let Testing = lastSibling.toString();
+    let ttt = `while (e["t"] <= this["mt2"]) e[e["t"]++] = 0;`;
+
+    if (ttt === Testing) {
+        console.log(Testing)
+    }
+    console.log(Testing);   
+    // console.log(generator(lastSibling).code)
+    let { declarations } = lastSibling.node;
+    if (!declarations) return;
+    let { id, init } = declarations[0];
+
+    // 获取首元素名
+    let arrName = id.name;
+    // 获取控制流初始值
+    try {
+        var lValue = init.object.property.value;
+        var rValue = init.property.value;    
+    } catch (error) {
+        return ;
+    }
+    let originValue = AVvBE.Egx()[lValue][rValue];
+
+    // 获取for循环中的参数值
+    let {test, body} = node;
+    let switchBody = body.body;
+    
+    if (!types.isMemberExpression(test.right)) return;
+    let forExpression = generator(test.right).code;
+    let breakArg = eval(forExpression);
+
+    // 获取所有case
+    let caseList = switchBody[0].cases;
+    let resultBody = [];
+
+    // caseList.forEach(forCase => {
+    //     let test = forCase.test;
+    //     let caseValue = eval(generator(test));
+        
+
+    //     for 
+        
+    // });
+
+    var returnCase = false;
+    for (; originValue != breakArg; ){
+        if (returnCase) break;
+        for (var i=0; i<caseList.length; i++) {
+            let test = generator(caseList[i].test).code;
+            let caseValue = eval(test);
+
+            if (originValue === caseValue) {
+                let caseBody = caseList[i].consequent;
+                if (types.isBreakStatement(caseBody[caseBody.length - 1]) &&
+                types.isExpressionStatement(caseBody[caseBody.length - 2]) &&
+                caseBody[caseBody.length - 2].expression.right.object.object.callee.object.name === 'AVvBE') {
+                    let expression = generator(caseBody[caseBody.length - 2].expression.right).code;
+
+                    let value = eval(expression);
+                    originValue = value;
+                    caseBody.pop();
+                    caseBody.pop();
+                }
+                else if (types.isReturnStatement(caseBody[caseBody.length - 2])) {
+                    returnCase = true;
+                    caseBody.pop();
+                }
+
+                else if (types.isBreakStatement(caseBody[caseBody.length - 1])) {
+                    caseBody.pop();
+                }
+    
+                resultBody = resultBody.concat(caseBody);
+                break;
+            }
+            // else break;
+        }
+    }
+
+    path.replaceWithMultiple(resultBody);
+    lastSibling.remove();
+    // if (!types.isSwitchStatement(switchBody[0])) return;
+    // if (!types.isIdentifier(switchBody[0].discriminant)) return;
+    
 }
 var ast = parser.parse(jscode);
 traverse(ast, visitor);
