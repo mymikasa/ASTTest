@@ -8,8 +8,8 @@ const traverse = require('@babel/traverse').default;
 const fs = require('fs');
 const { type } = require('os');
 
-var filePath = dirpath.join(dirpath.resolve(__dirname, '../'), 'encryption/jiyan_fillpage_8_9_8.js');
-var finPath = dirpath.join(dirpath.resolve(__dirname, '../'), 'decryption/jiyan_fillpage_8_9_8.js');
+var filePath = dirpath.join(dirpath.resolve(__dirname, '../'), 'decryption/jiyan_fillpage_8_9_8.js');
+var finPath = dirpath.join(dirpath.resolve(__dirname, '../'), 'decryption/jiyan_fillpage_8_9_8_01.js');
 console.log(filePath);
 var jscode = fs.readFileSync(filePath, {
     encoding: "utf-8"
