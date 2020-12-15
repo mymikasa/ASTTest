@@ -19,7 +19,8 @@
     "url": "https://github.com/mymikasa/ASTTest/issues"
   },
   "homepage": "https://github.com/mymikasa/ASTTest#readme",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@babel/core": "^7.10.2"
   }
 }
