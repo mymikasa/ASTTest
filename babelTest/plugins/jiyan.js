@@ -356,6 +356,7 @@ function replaceForSwitch(path) {
     // if (!types.isIdentifier(switchBody[0].discriminant)) return;
     
 }
+
 var ast = parser.parse(jscode);
 traverse(ast, visitor);
 
