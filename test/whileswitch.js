@@ -27,50 +27,54 @@ while (true) {
         continue;
     }
     break;
-}`
+}
+`
 
 
 const visitor = {
-    VariableDeclarator(path) {
-        const {id, init} = path.node;
-        // 判断是不是array类型以及元素的个数是否大于0
-        if (!t.isArrayExpression(init) || init.elements.length === 0) return;
-
-        // 获取array的所有元素
-        let elements = init.elements;
-        // 获取当前节点的作用域
-        const binding = path.scope.getBinding(id.name);
-        
-        for (const refer_path of binding.referencePaths) {
-            let member_path = refer_path.findParent(p=>p.isMemberExpression());
-            let property = member_path.get('property');
-
-            if (!property.isNumericLiteral()) {
-                continue;
-            }
-
-            let index = property.node.value;
-            let res = elements[index];
-            member_path.replaceWith(res);
-        }
+    WhileStatement: {
+        enter: [
+            whileSwitch,
+        ]
     }
-
 };
 
 function whileSwitch(path) {
-    let {test, body} = path.node;
-
-    if (!t.isSwitchStatement(body.body[0])) return;
-
-    let { discriminant,cases} = body.body[0];
-
-    if(!t.isMemberExpression(discriminant)||!t.isUpdateExpression(discriminant.property)) return;
-
-    let arrName = discriminant.object.name;
+    const {test,body} = path.node;
+    if (!t.isBooleanLiteral(test) || test.value !== true) return;
+    if (body.body.length === 0  || !t.isSwitchStatement(body.body[0])) return;
+    let switch_state = body.body[0];
+    let {discriminant,cases} = switch_state;
+    if (!t.isMemberExpression(discriminant) || !t.isUpdateExpression(discriminant.property)) return;
+    let arr_name = discriminant.object.name;
     let arr = [];
-        
+    let all_pre_siblings = path.getAllPrevSiblings();
 
-    
+    if (all_pre_siblings.length !== 2) return;
+    all_pre_siblings.forEach(pre_path => {
+        let { declarations } = pre_path.node;
+        let { id, init } = declarations[0];
+
+        if (arr_name === id.name) {
+            // let tt = traverse(init);
+            let tt = generator(init);
+            arr = eval(tt.code);
+        }
+        pre_path.remove()
+    });
+
+    let retBody = [];
+
+    arr.forEach(index => {
+        let caseBody = cases[index].consequent;
+        if (t.isContinueStatement(caseBody[caseBody.length - 1])) {
+            caseBody.pop()
+        }
+        retBody = retBody.concat(caseBody)
+    });
+
+    path.replaceInline(retBody);
+
 }
 
 var ast = parser.parse(jscode);

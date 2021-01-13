@@ -467,5 +467,3 @@ t = function (t, e) {
     return t[C] && kt["updateServerTime"](t[C]), kt;
   };
 };
-
-t.yt();
